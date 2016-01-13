@@ -1,0 +1,122 @@
+<html>
+<head>
+<meta charset=utf-8 />
+<title>RSEI Data</title>
+<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+<script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.6/mapbox.js'></script>
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<link href='https://api.tiles.mapbox.com/mapbox.js/v2.1.6/mapbox.css' rel='stylesheet' />
+<script src='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/leaflet.markercluster.js'></script>
+<link href='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/MarkerCluster.css' rel='stylesheet' />
+<link href='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/MarkerCluster.Default.css' rel='stylesheet' />
+<link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css">
+
+<style>
+  body { margin:0; padding:0; }
+  #map {
+      height:100%;
+      width:100%;
+      padding:0px;
+      margin: 0px;
+      border: 2px solid;
+      border-radius: 5px;
+      border-color: #CDD2D4;
+}
+.legend label,
+.legend span {
+  display:block;
+  float:left;
+  height:15px;
+  width:20%;
+  text-align:center;
+  font-size:9px;
+  color:#000000;
+  }
+</style>
+</head>
+<body>
+<div id='legend' style='display:none;'>
+  <strong>2009 EPA RSEI Data</strong><br>
+  <em><strong>Percentile of toxic risk per grid cell</strong></em>
+  <nav class='legend clearfix'>
+    <span style='background:#313695; opacity:.6;'>0-5</span>
+    <span style='background:#3B57A5; opacity:.6;'>5-10</span>
+    <span style='background:#4777B5; opacity:.6;'>10-15</span>
+    <span style='background:#6095C4; opacity:.6;'>15-20</span>
+    <span style='background:#79B1D3; opacity:.6;'>20-25</span>
+    <span style='background:#96C8E0; opacity:.6;'>25-30</span>
+    <span style='background:#B3DDEB; opacity:.6;'>30-35</span>
+    <span style='background:#CFEAF3; opacity:.6;'>35-40</span>
+    <span style='background:#E6F5EB; opacity:.6;'>40-45</span>
+    <span style='background:#F6FBCD; opacity:.6;'>45-50</span>
+    <span style='background:#FEF6B2; opacity:.6;'>50-55</span>
+    <span style='background:#FEE699; opacity:.6;'>55-60</span>
+    <span style='background:#FDD081; opacity:.6;'>60-65</span>
+    <span style='background:#FDB568; opacity:.6;'>65-70</span>
+    <span style='background:#F99655; opacity:.6;'>70-75</span>
+    <span style='background:#F47346; opacity:.6;'>75-80</span>
+    <span style='background:#E75337; opacity:.6;'>80-85</span>
+    <span style='background:#D83328; opacity:.6;'>85-90</span>
+    <span style='background:#BF1926; opacity:.6;'>90-95</span>
+    <span style='background:#A50026; opacity:.6;'>95-100</span>
+    <em>Grid cells only visible at higher zoom levels.</em>
+    </div>
+
+
+
+<div id='map'></div>
+
+
+
+
+
+<script>
+
+var clusterLayer = new L.MarkerClusterGroup();
+
+L.mapbox.accessToken = 'pk.eyJ1IjoiaWFubXVub3oiLCJhIjoiQkduNG9oayJ9.OVrEVQxs6BUpCi7lLMhTsA';
+
+var locations = null;
+var all   = null;
+
+d3.csv("data/Facility.csv", function(error, data) {
+
+  
+ data.forEach( function(d,i) {
+
+  if (!isNaN(d.Latitude) && d.Latitude != null && d.Longitude != undefined ) {
+              d.ll = L.latLng(+d.Latitude,+d.Longitude);
+              var mark = L.marker([+d.Latitude,+d.Longitude,d.Name,d.ParentName]);
+              mark.bindPopup(d.Name,d.ParentName);
+              clusterLayer.addLayer(mark);
+            }
+	d.pcontribution = +d.pcontribution;	
+	});
+
+  //meeting charts
+
+});
+
+
+
+var map = L.mapbox.map('map', 'ianmunoz.a3f08515')
+    .setView([38.9, -77.01], 9)
+    .addControl(L.mapbox.geocoderControl('mapbox.places'));
+
+var overlays = {
+          "Clustered Markers": clusterLayer,
+        };
+
+ L.control.layers(overlays).addTo(map);
+
+ map.addLayer(clusterLayer);
+ map.legendControl.addLegend(document.getElementById('legend').innerHTML);
+ 
+
+
+</script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+</body>
+</html>
